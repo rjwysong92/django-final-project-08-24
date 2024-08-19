@@ -6,8 +6,11 @@ except Exception:
     print("There was an error loading django modules. Do you have django installed?")
     sys.exit()
 
+
 from django.conf import settings
 import uuid
+
+
 
 
 # Instructor model
@@ -19,8 +22,11 @@ class Instructor(models.Model):
     full_time = models.BooleanField(default=True)
     total_learners = models.IntegerField()
 
+
     def __str__(self):
         return self.user.username
+
+
 
 
 # Learner model
@@ -47,9 +53,12 @@ class Learner(models.Model):
     )
     social_link = models.URLField(max_length=200)
 
+
     def __str__(self):
         return self.user.username + "," + \
                self.occupation
+
+
 
 
 # Course model
@@ -95,9 +104,30 @@ class Enrollment(models.Model):
     rating = models.FloatField(default=5.0)
 
 
-# One enrollment could have multiple submission
-# One submission could have multiple choices
-# One choice could belong to multiple submissions
-#class Submission(models.Model):
-#    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-#    choices = models.ManyToManyField(Choice)
+# questions model
+class Question(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    content = models.CharField(max_length=200)
+    grade = models.IntegerField(default=50)
+        # method to calculate if the learner gets the score of the question
+    def __str__(self):
+        return "Question:" + self.content
+
+    def is_get_score(self, selected_ids):
+        all_answers = self.choice_set.filter(is_correct=True).count()
+        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+        if all_answers == selected_correct:
+            return True
+        else:
+            return False
+
+# choice model
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    content = models.CharField(max_length=100)
+    is_correct = models.BooleanField(default=False)
+
+# subimssion model
+class Submission(models.Model):
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    choices = models.ManyToManyField(Choice)
