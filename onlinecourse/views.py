@@ -128,7 +128,7 @@ def extract_answers(request):
 
 # <HINT> Create an exam result view to check if learner passed exam and show their question results and result for each question,
 def show_exam_result(request, course_id, submission_id):
-    conext = {}
+    context = {}
     course = get_object_or_404(Course, pk=course_id)
     submission = Submission.objects.get(id=submission_id)
     choices = submission.choices.all()
